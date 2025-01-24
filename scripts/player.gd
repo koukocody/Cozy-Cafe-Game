@@ -3,13 +3,17 @@
 extends Node2D
 
 @onready var tile_map = $"../TileMapLayer"
+@onready var player_sprite = $CharacterBody2D/AnimatedSprite2D
 
 var astar_grid: AStarGrid2D
 var current_id_path: Array[Vector2i]
 var target_position: Vector2
+var direction: Vector2
 var is_moving: bool
+var idle_direction : String
 
 func _ready():
+	player_sprite.animation = "idle_down"
 	astar_grid = AStarGrid2D.new()
 	astar_grid.region = tile_map.get_used_rect()
 	astar_grid.cell_size = Vector2(16, 16)
@@ -49,9 +53,22 @@ func _physics_process(_delta):
 		target_position = tile_map.map_to_local(current_id_path.front())
 		is_moving = true
 	global_position = global_position.move_toward(target_position, 1)
+	direction = (global_position - target_position).normalized()
+	print(direction)
+	var animations = {
+		Vector2(1, 0): ["walk_left", "idle_left"],
+		Vector2(-1, 0): ["walk_right", "idle_right"],
+		Vector2(0, 1): ["walk_up", "idle_up"],
+		Vector2(0, -1): ["walk_down", "idle_down"]
+			}
+	if direction in animations:
+		player_sprite.animation = animations[direction][0]
+		idle_direction = animations[direction][1]
+
 	if global_position == target_position:
 		current_id_path.pop_front()
 		if current_id_path.is_empty() == false:
 			target_position = tile_map.map_to_local(current_id_path.front())
 		else:
+			player_sprite.animation = idle_direction
 			is_moving = false
