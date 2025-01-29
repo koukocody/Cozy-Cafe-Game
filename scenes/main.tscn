@@ -4906,6 +4906,8 @@ offset_top = -14.0
 
 [node name="AnimatedSprite2D" parent="Customer/StaticBody2D" index="1"]
 y_sort_enabled = true
+animation = &"walk_right"
+frame_progress = 0.0
 
 [node name="Path" type="Node2D" parent="."]
 y_sort_enabled = true
